@@ -1,6 +1,7 @@
 import numpy as np
 import gzip
 from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
 
 Learning_rate = 0.1
 Momentum = 0.9
@@ -48,22 +49,24 @@ for row in range(len(test_labels)):
 
 ####################################################################################################################################
 
-hidden_layer_weights = np.random.uniform(-0.05, 0.05, size=(785,Hidden_Layer_1))
-output_layer_weights_with_bias = np.random.uniform(-0.05, 0.05, size=(Hidden_Layer_1+1,10))
+hidden_layer_weights = np.random.uniform(-0.05, 0.05, size=(785,Hidden_Layer_2))
+output_layer_weights_with_bias = np.random.uniform(-0.05, 0.05, size=(Hidden_Layer_2+1,10))
 
-modified_weights_hidden_to_output = np.zeros((Hidden_Layer_1+1,10))
-modified_weights_input_to_hidden = np.zeros((Hidden_Layer_1,785))
+modified_weights_hidden_to_output = np.zeros((Hidden_Layer_2+1,10))
+modified_weights_input_to_hidden = np.zeros((Hidden_Layer_2,785))
 
 
 h6 = np.zeros((60000,1))
 finding_accuracy_train = np.zeros((60000,1))
 finding_accuracy_test = np.zeros((10000,1))
-hj = np.zeros(Hidden_Layer_1+1)
+hj = np.zeros(Hidden_Layer_2+1)
 hj[0] = 1
 
+accuracy_train = np.zeros(50)
+accuracy_test = np.zeros(50)
 
 
-for i in range(1):
+for i in range(50):
     for row in range(len(train_images)):
         wjixi = np.dot(train_images[row][:],hidden_layer_weights)
         
@@ -96,6 +99,10 @@ for i in range(1):
         index = np.argmax(Ok,axis=0)
         finding_accuracy_train[row] =  index
 
+    cfm_train = confusion_matrix(train_labels,finding_accuracy_train)
+    diagonal_sum_train =  sum(np.diag(cfm_train))
+    accuracy_train[i] = (diagonal_sum_train/60000.00)*100
+
 
     for row in range(len(test_images)):
         
@@ -109,24 +116,42 @@ for i in range(1):
         index = np.argmax(Ok,axis=0)
         finding_accuracy_test[row] =  index
 
+    cfm_test = confusion_matrix(test_labels,finding_accuracy_test)
+    diagonal_sum_test =  sum(np.diag(cfm_test))
+    accuracy_test[i] = (diagonal_sum_test/10000.00)*100
 
 
-cfm_train = confusion_matrix(train_labels,finding_accuracy_train)
-diagonal_sum_train =  sum(np.diag(cfm_train))
-accuracy_train = (diagonal_sum_train/60000.00)*100
+
 print cfm_train
 print accuracy_train
 
 
-cfm_test = confusion_matrix(test_labels,finding_accuracy_test)
-diagonal_sum_test =  sum(np.diag(cfm_test))
-accuracy_test = (diagonal_sum_test/10000.00)*100
+
 print cfm_test
 print accuracy_test
 
 
-#print h6
-#print train_labels
-#cfm = confusion_matrix(h6,train_labels)
-#print cfm
-#print accuracy
+plt.plot(accuracy_train)
+plt.plot(accuracy_test)
+plt.ylabel("Accuracy in %")
+plt.xlabel("Epoch")
+
+image= "hidden20.png"
+plt.title("For 20 hidden layers")
+plt.savefig(image)
+plt.show()
+
+print "CONFUSION MATRIX OF TRAIN SET : For 20 hidden layers \n"
+print cfm_train
+
+print "CONFUSION MATRIX OF TEST SET : For 20 hidden layers \n"
+print cfm_test
+
+print "\n"
+print "accuracy_train: "
+print accuracy_train
+
+print "\n"
+print "accuracy_test: "
+print accuracy_test
+
